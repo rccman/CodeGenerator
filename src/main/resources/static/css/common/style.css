@@ -1,0 +1,30 @@
+.header{ border: 1px solid #bbb; margin:0 5px; }
+.header span{ line-height: 36px; margin-left: 10px; margin-right: 10px; font-weight:bold;}
+.header em{ line-height: 36px; margin-right: -20px;}
+.header button{margin: 4px 5px; border-radius:3px; padding:6px 10px; text-align: center; background: #27bda6; color: #fff; margin-left: 10px; bottom: 20px; }
+
+.container{ height: 90%; border: 1px solid #bbb; border-top: none; margin:0 5px; position: relative; overflow: hidden;}
+.container .sideBar{ width:450px; height: 100%; float: left; }
+.container .mainList{ width: 260px; min-height: 100%; float: left; border-right: 1px solid #bbb; border-left: 1px solid #bbb;}
+.container .mainList li{ height: 226px; overflow: hidden;}
+.container .mainList li h3{ line-height: 30px; text-indent: 8px; border-top:1px solid #bbb; border-bottom: 1px solid #bbb;}
+.container .mainList button{ border-radius:3px; padding:6px 10px; text-align: center; background: #27bda6; color: #fff; margin-left: 10px; position: fixed; bottom: 20px; }
+.container .mainCont{ float: left; margin-top: 10px; margin-left: 10px; right: 0; }
+
+.container .selList{ border-right: 1px solid #bbb; border-left: 1px solid #bbb; width: 100%; height: 100%;overflow: auto;}
+.container .selList li{ width: 100%; height:30px !important; line-height: 30px; }
+.container .selList li input{ margin-left: 10px; }
+.container .selList li a{ width:80%; color: #000; display: inline-block; vertical-align: middle; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.container .content{ margin-top: 30px; }
+
+/* 美化多选框 */
+label {font-size:12px;cursor:pointer; margin-left:10px;}
+label i {font-size:12px;font-style:normal;display:inline-block;width:12px;height:12px;text-align:center;line-height:12px;color:#fff;vertical-align:middle;margin:-2px 2px 1px 0px;border:2px #27bda6 solid;}
+input[type="checkbox"],input[type="radio"] {display:none;}
+input[type="checkbox"]:checked + i,input[type="radio"]:checked + i {background:#27bda6;}
+
+/* 美化select */
+select#selectPointOfInterest{ width: 80px; height: 26px; line-height: 26px; padding-right: 20px; text-indent: 4px; text-align: left; vertical-align: middle; border: 1px solid #27bda6; -moz-border-radius: 2px;-webkit-border-radius: 2px; border-radius: 2px; -webkit-appearance: none; -moz-appearance: none; appearance: none;color:#000; cursor: pointer;outline: none;}
+label#lblSelect{ position: relative; display: inline-block;}
+label#lblSelect::after{ content: "\25bc"; position: absolute; top: 0; right: 0; bottom: 0; width: 20px; line-height: 26px; vertical-align: middle; text-align: center; background: #27bda6; color: #fff; -moz-border-radius: 0 6px 6px 0; -webkit-border-radius: 0 6px 6px 0; border-radius: 0 6px 6px 0; pointer-events: none;}
+html,body{width: 100%; height: 100%;}

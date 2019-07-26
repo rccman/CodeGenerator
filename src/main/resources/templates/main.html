@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>任超超的代码生成器</title>
+	<link rel="stylesheet" type="text/css" href="css/common/common.css"/>
+	<link rel="stylesheet" type="text/css" href="css/common/style.css"/>
+	<script src="js/common/jquery.min.js" type="text/javascript"></script>
+	<script src="js/common/ajax.util.js" type="text/javascript"></script>
+	<script src="js/common/common.js" type="text/javascript"></script>
+</head>
+<body>
+	<div class="wrapper header" style="text-align: center">
+		<span style="font-size: 20px">任超超的代码生成器</span>
+	</div>
+	<div class="wrapper header">
+		<form id="frm" action="getConn">
+			<span>service:</span><em><input id="service" name="service" type="text" value="172.16.13.62"/></em>
+			<span>database:</span><em><input id="database" name="database" type="text" value="hzfh"/></em>
+			<span>port:</span><em><input id="port" name="port" type="text" value="3306"/></em>
+			<span>uid:</span><em><input id="uid" name="uid" type="text" value="root"/></em>
+			<span>pwd:</span><em><input id="pwd" name="pwd" type="text" value="123456"/></em>
+			<span>Author:</span><em><input id="Author" name="Author" type="text" value="hz"/></em>
+			<span>SystemId:</span><em><input id="systemid" name="systemid" type="text" value="pem"/></em>
+		</form>
+	</div>
+	<div class="wrapper header">
+		<button id="conn" type="button">连接数据库</button><button id="doCode" type="button">批量生成代码</button><button id="doCodeByTablename" type="button">单表生成代码</button>
+	</div>
+	<div class="container clearfix">
+		<div class="sideBar">
+			<ul class="selList">
+			</ul>
+		</div>
+		<div class="mainCont">
+			<ul>
+				<li>
+				<label>
+					<span>fields:</span>
+				</label>
+				<label>
+					<input id="allChk" type="checkbox" checked="true"/><i>✓</i><span>全选</span>
+				</label>
+				<div class="content">
+					<ul>
+					</ul>
+				</div>
+			</li>
+		</ul>
+		</div>
+	</div>
+	<script>
+	var tablename;
+		$(function(){
+			$('.content input[type=checkbox]').prop('checked',$('#allChk').prop('checked'));
+			
+			/* $('label a').click(function(){
+				var selCheck=$(this).prev().prev();
+				if(selCheck.prop('checked')){
+					selCheck.prop("checked",false);
+				}else{
+					selCheck.prop("checked",true);
+				}
+			}); */
+			
+			$('#allChk').click(function(){
+				$('.content input[type=checkbox]').prop('checked',$(this).prop('checked'));
+			});
+			
+			$('#conn').click(function(){
+				var param = $('#frm').serializeJson();
+	            ajaxPost($('#frm').attr('action'),param,function(result){
+	            	var tables = result.resultList;
+                    var html = '<li><label><input id="{0}" name="{0}" type="checkbox" value="{0}"/><i>✓</i><a href="#">{0}</a></label></li>';
+	            	var content = "";
+	            	for(var i in tables){
+	            		if(i!='contains'){
+		            		//console.log(tables[i]);
+		            		content += html.format(tables[i]);
+	            		}
+	            	}
+	            	$('.selList').html(content);
+	            	$('.selList label a').click(function(){
+	    				var selCheck = $(this).prev().prev();
+	    				tablename = $(this).html();
+	    				if(selCheck.prop('checked')){
+	    					selCheck.prop("checked",false);
+	    				}else{
+	    					selCheck.prop("checked",true);
+		    				ajaxPostParam("getColumnByTableName?tableName="+tablename,"",function(result){
+                                var columnHtml = '<li><label><input id="{0}" name="{0}" type="checkbox" value="{0}"/><i>✓</i><a href="#" style="width: 200px">{0}</a><a href="#" style="margin-left: 30px">{1}</a></label></li>';
+		    					content = '';
+		    					for(i in result.resultList){
+			    					content += columnHtml.format(result.resultList[i].columnName,result.resultList[i].comment);
+		    					}
+		    					$('.content ul').html(content);
+		    					$('.content label a').click(function(){
+		    						var selCheck=$(this).prev().prev();
+		    						if(selCheck.prop('checked')){
+		    							selCheck.prop("checked",false);
+		    						}else{
+		    							selCheck.prop("checked",true);
+		    						}
+		    					});
+		    					$('#allChk').prop('checked',true);
+		    					$('.content input[type=checkbox]').prop('checked',true);
+		    				});
+	    				}
+	    			});
+	    		}); 
+			});
+			
+			$('#doCode').click(function(){
+				var obj = $(".selList label input");
+				var tables = new Array();
+				for(k in obj){
+			        if(obj[k].checked)
+			        	tables.push(obj[k].value);
+			    }
+				var param = {"tables":tables};
+				ajaxPost("doGenerator",param,function(result){
+		            alert(result.errDesc);
+				});
+			});
+			
+			$('#doCodeByTablename').click(function(){
+				var obj = $(".content label input");
+				var fields = new Array();
+				for(k in obj){
+			        if(!obj[k].checked)
+			        	fields.push(obj[k].value);
+			    }
+				var param = {"fields":fields};
+				ajaxPost("doGeneratorByTablename?tablename="+tablename,param,function(result){
+		            alert(result.errDesc);
+				});
+			});
+		});
+	</script>
+</body>
+</html>

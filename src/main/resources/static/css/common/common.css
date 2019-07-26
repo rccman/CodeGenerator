@@ -1,0 +1,52 @@
+html,
+body,
+header,
+section,
+footer,
+div,
+ul,
+ol,
+li,
+img,
+a,
+span,
+strong,
+fieldset,
+button,
+form,
+label,
+dl,
+dt,
+dd,
+input,
+hr,
+time,
+figcaption,
+figure,
+textarea,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  font-family: "微软雅黑";
+  outline-style:none;
+  font-size: 14px;
+}
+a{ outline-style:none; text-decoration:none;}
+ul,ol,li{ list-style: none;}
+input,button,textarea,select{ outline: none;}
+i, em{ font-style: normal; }
+.borNone{ border-top:none !important; }
+.fl{ float: left; }
+.clearfix:after{
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden; }
