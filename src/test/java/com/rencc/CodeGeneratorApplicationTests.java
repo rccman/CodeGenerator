@@ -1,4 +1,4 @@
-package com.fmp;
+package com.rencc;
 
 
 import java.sql.DatabaseMetaData;
@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 
 import org.junit.Test;
 
-import com.fmp.service.controller.generatorController;
-import com.fmp.service.utils.CommUtil;
 import com.mysql.jdbc.Connection;
 
 //@RunWith(SpringRunner.class)

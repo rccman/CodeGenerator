@@ -1,4 +1,4 @@
-package com.fmp.service.controller;
+package com.rencc.service.controller;
 
 import java.io.File;
 import java.sql.DatabaseMetaData;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.fmp.service.utils.BaseResult;
-import com.fmp.service.utils.ColumnData;
-import com.fmp.service.utils.CommUtil;
-import com.fmp.service.utils.CommonPageParser;
-import com.fmp.service.utils.CreateBean;
+import com.rencc.service.utils.BaseResult;
+import com.rencc.service.utils.ColumnData;
+import com.rencc.service.utils.CommUtil;
+import com.rencc.service.utils.CommonPageParser;
+import com.rencc.service.utils.CreateBean;
 import com.mysql.jdbc.Connection;
 
 @Controller

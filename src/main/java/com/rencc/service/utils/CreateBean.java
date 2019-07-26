@@ -1,4 +1,4 @@
-package com.fmp.service.utils;
+package com.rencc.service.utils;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
