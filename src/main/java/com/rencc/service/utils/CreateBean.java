@@ -161,19 +161,16 @@ public class CreateBean {
         StringBuffer sql = new StringBuffer();
         sql.append("insert into ");
         sql.append(tableName);
-        sql.append("(");
-        sql.append(columnFields);
-        sql.append(")\n");
-        sql.append("\t\t values (");
+        sql.append("\n\t\t<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
         for (ColumnData columnData : columnDatas) {
-            sql.append("#{");
-            sql.append(columnData.getFormatColumnName());
-            sql.append(",jdbcType=");
-            sql.append(CommUtil.formatColumnType(columnData.getColumnType()));
-            sql.append("},");
+            sql.append("\t\t\t<if test=\""+columnData.getFormatColumnName()+"!=null\">"+columnData.getColumnName() + ",</if> \n");
         }
-        sql.deleteCharAt(sql.length()-1);
-        sql.append(")");
+        sql.append("\t\t</trim>");
+        sql.append("\n\t\t<trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\">\n");
+        for (ColumnData columnData : columnDatas) {
+            sql.append("\t\t\t<if test=\""+columnData.getFormatColumnName()+"!=null\">#{" + columnData.getFormatColumnName() + ",jdbcType="+CommUtil.formatColumnType(columnData.getColumnType())+"},</if> \n");
+        }
+        sql.append("\t\t</trim>");
         return sql.toString();
     }
 
@@ -237,9 +234,10 @@ public class CreateBean {
                 sb.append("\t\t\t<if test=\""+CommUtil.formatName(column)+"!=null\">"+column + "=#{" + CommUtil.formatName(column) + ",jdbcType="+CommUtil.formatColumnType(type)+"},</if> \n");
             }
         }
-        String update = "update " + tableName + "\n \t\t<set> \n" + sb.toString() + "\t\t</set>\n \t\t where " + columnsList.get(0).getColumnName() + "=#{" + CommUtil.formatName(columnsList.get(0).getColumnName()) + "}";
+        String update = "update " + tableName + "\n \t\t<set> \n" + sb.toString() + "\t\t</set>\n \t\t where " + columnsList.get(0).getColumnName() + " = #{" + CommUtil.formatName(columnsList.get(0).getColumnName()) + ",jdbcType="+CommUtil.formatColumnType(columnsList.get(0).getColumnType())+"}";
         return update;
     }
+
     public String getUpdateSqlOld(String tableName, String[] columnsList) throws SQLException {
         StringBuffer sb = new StringBuffer();
 
