@@ -5,3 +5,4 @@ spring:
 server:
   error:
     path: /error
+  port: 80

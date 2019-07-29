@@ -62,13 +62,14 @@ public class CreateBean {
             String maxChar = name.substring(0, 1).toUpperCase();
             type = CommUtil.formatType(type);
             name = CommUtil.formatName(name);
-            str.append("\r\t").append("@ApiModelProperty(value = \"").append(remark).append("\")");
+            str.append("\r\t/**\n\t * ").append(remark).append("\n\t **/");
             str.append("\r\t").append("private ").append(type + " ").append(name).append(";");
-            String method = maxChar + name.substring(1, name.length());
+            //get set 方法暂时注掉
+            /*String method = maxChar + name.substring(1, name.length());
             getset.append("\r\t").append("public ").append(type + " ").append("get" + method + "() {\r\t");
             getset.append("    return this.").append(name).append(";\r\t}");
             getset.append("\r\t").append("public void ").append("set" + method + "(" + type + " " + name + ") {\r\t");
-            getset.append("    this." + name + "=").append(name).append(";\r\t}");
+            getset.append("    this." + name + "=").append(name).append(";\r\t}");*/
         }
        
         String argv = str.toString();
@@ -87,21 +88,19 @@ public class CreateBean {
         int i =0 ;
         while(colRet.next()) {
             i++ ;
-            if(i==2){
-                String name = colRet.getString("COLUMN_NAME");
-                String type = colRet.getString("TYPE_NAME");
-                String remark = colRet.getString("REMARKS");
-                String maxChar = name.substring(0, 1).toUpperCase();
-                type = CommUtil.formatType(type);
-                name = CommUtil.formatName(name);
-                str.append("\r\t").append("@ApiModelProperty(value = \"").append(remark).append("\")");
-                str.append("\r\t").append("private ").append(type + " ").append(name).append(";");
-                String method = maxChar + name.substring(1, name.length());
-                getset.append("\r\t").append("public ").append(type + " ").append("get" + method + "() {\r\t");
-                getset.append("    return this.").append(name).append(";\r\t}");
-                getset.append("\r\t").append("public void ").append("set" + method + "(" + type + " " + name + ") {\r\t");
-                getset.append("    this." + name + "=").append(name).append(";\r\t}");
-            }
+            String name = colRet.getString("COLUMN_NAME");
+            String type = colRet.getString("TYPE_NAME");
+            String remark = colRet.getString("REMARKS");
+            String maxChar = name.substring(0, 1).toUpperCase();
+            type = CommUtil.formatType(type);
+            name = CommUtil.formatName(name);
+            str.append("\r\t/**\n\t * ").append(remark).append("\n\t **/");
+            str.append("\r\t").append("private ").append(type + " ").append(name).append(";");
+            String method = maxChar + name.substring(1, name.length());
+            getset.append("\r\t").append("public ").append(type + " ").append("get" + method + "() {\r\t");
+            getset.append("    return this.").append(name).append(";\r\t}");
+            getset.append("\r\t").append("public void ").append("set" + method + "(" + type + " " + name + ") {\r\t");
+            getset.append("    this." + name + "=").append(name).append(";\r\t}");
         }
 
         String argv = str.toString();
@@ -122,7 +121,7 @@ public class CreateBean {
             	continue;
             }
             String type = colRet.getString("TYPE_NAME");
-            cd.setColumnType(type);
+            cd.setColumnType(CommUtil.formatColumnType(type));
             type = CommUtil.formatType(type);
             cd.setColumnName(name);
             cd.setDataType(type);
@@ -134,8 +133,7 @@ public class CreateBean {
     
     public Map<String, Object> getAutoCreateSql(String tableName,Map<String,String> map) throws Exception {
         Map sqlMap = new HashMap();
-        List columnDatas = getColumnDatas(tableName,map);
-
+        List<ColumnData> columnDatas = getColumnDatas(tableName,map);
         String columns = getColumnSplit(columnDatas);
         String formatColumns = getFormatColumnSplit(columnDatas);
 
@@ -143,29 +141,54 @@ public class CreateBean {
 
         String[] columnList = getColumnList(columns);
         String columnFields = getColumnFields(columns);
-        String insert = "insert into " + tableName + "(" + inst_columns.replaceAll("\\|", ",") + ")\r\n\t\tvalues(#{" + formatColumns.replaceAll("\\|", "},#{") + "})";
+        String insert = getInsertSql(tableName,columnDatas,columnFields);
         String update = getUpdateSqlOld(tableName, columnList);
+        String selectByWhere = getSelectByWhereSql(tableName, columnDatas);
         String update2 = getUpdateSql(tableName, columnDatas);
-        String selectById = getSelectByIdSql(tableName, columnList);
-        String delete = getDeleteSql(tableName, columnList);
-        if(insert.contains("#{in_time}")){
-            insert.replace("#{in_time}", "current_timestamp()");
-        }
-        if(insert.contains("#{edit_time}")){
-            insert.replace("#{edit_time}", "current_timestamp()"); 
-        }
-        if(update.contains("#{edit_time}")){
-            update.replace("#{edit_time}", "current_timestamp()");
-        }
+        String selectById = getSelectByIdSql(tableName, columnList, columnDatas);
+        String delete = getDeleteSql(tableName, columnList,columnDatas);
         sqlMap.put("columnList", columnList);
         sqlMap.put("columnFields", columnFields);
         sqlMap.put("insert", insert);
-        sqlMap.put("update", update);
-        sqlMap.put("update2", update2);
+        sqlMap.put("selectByWhere", selectByWhere);
+        sqlMap.put("update", update2);
         sqlMap.put("delete", delete);
         sqlMap.put("selectById", selectById);
         return sqlMap;
     }
+
+    private String getInsertSql(String tableName, List<ColumnData> columnDatas, String columnFields) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("insert into ");
+        sql.append(tableName);
+        sql.append("(");
+        sql.append(columnFields);
+        sql.append(")\n");
+        sql.append("\t\t values (");
+        for (ColumnData columnData : columnDatas) {
+            sql.append("#{");
+            sql.append(columnData.getFormatColumnName());
+            sql.append(",jdbcType=");
+            sql.append(CommUtil.formatColumnType(columnData.getColumnType()));
+            sql.append("},");
+        }
+        sql.deleteCharAt(sql.length()-1);
+        sql.append(")");
+        return sql.toString();
+    }
+
+    private String getSelectByWhereSql(String tableName, List<ColumnData> columnDatas) {
+        StringBuffer select = new StringBuffer();
+        select.append("select <include refid=\"column\" /> FROM "+tableName+" \n\t\t<where>\n");
+        for (ColumnData columnData : columnDatas) {
+            select.append("\t\t\t<if test=\""+CommUtil.formatName(columnData.getColumnName())+" != null\">\n" +
+                    "\t\t\t\tAND "+columnData.getColumnName()+" = #{"+CommUtil.formatName(columnData.getColumnName())+",jdbcType="+CommUtil.formatColumnType(columnData.getColumnType())+"}\n" +
+                    "\t\t\t</if>\n");
+        }
+        select.append("\t\t</where>");
+        return select.toString();
+    }
+
     public String getColumnSplit(List<ColumnData> columnList) throws SQLException {
         StringBuffer commonColumns = new StringBuffer();
         for (ColumnData data : columnList) {
@@ -211,20 +234,10 @@ public class CreateBean {
             String column = columnsList.get(i).getColumnName();
             String type = columnsList.get(i).getColumnType();
             if (!"in_time".equalsIgnoreCase(column)) {
-                if ("edit_time".equalsIgnoreCase(column)){
-                    sb.append("\t\t<if test=\""+column+"!=null and "+column+"!=''\">,"+column + "=current_timestamp()</if>");
-                }else{
-                    if("int".equalsIgnoreCase(type)) {
-                        sb.append("\t\t<if test=\"" + column + "!=null and " + column + "!=0\">," + column + "=#{" + CommUtil.formatName(column) + "}</if>");
-                    }else{
-                        sb.append("\t\t<if test=\""+column+"!=null and "+column+"!=''\">,"+column + "=#{" + CommUtil.formatName(column) + "}</if>");
-                    }
-                }
-//                if (i + 1 < columnsList.size())
-//                    sb.append(",\n");
+                sb.append("\t\t\t<if test=\""+CommUtil.formatName(column)+"!=null\">"+column + "=#{" + CommUtil.formatName(column) + ",jdbcType="+CommUtil.formatColumnType(type)+"},</if> \n");
             }
         }
-        String update = "update " + tableName + " set \n" + sb.toString() + "\n \t\t where " + columnsList.get(0).getColumnName() + "=#{" + CommUtil.formatName(columnsList.get(0).getColumnName()) + "}";
+        String update = "update " + tableName + "\n \t\t<set> \n" + sb.toString() + "\t\t</set>\n \t\t where " + columnsList.get(0).getColumnName() + "=#{" + CommUtil.formatName(columnsList.get(0).getColumnName()) + "}";
         return update;
     }
     public String getUpdateSqlOld(String tableName, String[] columnsList) throws SQLException {
@@ -245,18 +258,18 @@ public class CreateBean {
         String update = "update " + tableName + " set " + sb.toString() + " where " + columnsList[0] + "=#{" + CommUtil.formatName(columnsList[0]) + "}";
         return update;
     }
-    public String getSelectByIdSql(String tableName, String[] columnsList) throws SQLException {
+    public String getSelectByIdSql(String tableName, String[] columnsList, List<ColumnData> colRet) throws SQLException {
         StringBuffer sb = new StringBuffer();
         sb.append("select <include refid=\"column\" /> \n");
-        sb.append("\t from ").append(tableName).append(" where ");
-        sb.append(columnsList[0]).append(" = #{").append(CommUtil.formatName(columnsList[0])).append("}");
+        sb.append("\t\tfrom ").append(tableName).append(" where ");
+        sb.append(columnsList[0]).append(" = #{").append(CommUtil.formatName(columnsList[0])).append(",jdbcType=").append(CommUtil.formatColumnType(colRet.get(0).getColumnType())).append("}");
         return sb.toString();
     }
-    public String getDeleteSql(String tableName, String[] columnsList) throws SQLException {
+    public String getDeleteSql(String tableName, String[] columnsList, List<ColumnData> colRet) throws SQLException {
         StringBuffer sb = new StringBuffer();
         sb.append("delete ");
         sb.append("\t from ").append(tableName).append(" where ");
-        sb.append(columnsList[0]).append(" = #{").append(CommUtil.formatName(columnsList[0])).append("}");
+        sb.append(columnsList[0]).append(" = #{").append(CommUtil.formatName(columnsList[0])).append(",jdbcType=").append(CommUtil.formatColumnType(colRet.get(0).getColumnType())).append("}");
         return sb.toString();
     }
 

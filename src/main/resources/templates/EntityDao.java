@@ -1,16 +1,22 @@
-package ${commPackage}.${databaseName}.dao;
+package ${commPackage}.${databaseName}.mapper;
 
-import com.hzfh.base.entity.BaseDao;
-import ${commPackage}.${databaseName}.entity.${className}Bean;
-import ${commPackage}.${databaseName}.api.entity.${className}Param;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
 /**
- * <p>Description: Dao</p>
- * <p>Company:hzjk</p>
+ * @Description: Mapper
  * @author ${author}
  * @date $!{time}
  */
-@Repository
-public interface ${className}Dao extends BaseDao<${className}Bean, ${className}Param> {
+
+public interface ${className}Mapper {
+
+    int insert(${className}Po record);
+
+    int updateByPrimaryKey(${className}Po entity);
+
+    List<${className}Po> selectByWhere(${className}Po entity);
+
+    ${className}Po selectByPrimaryKey(Long id);
+
+    int deleteByPrimaryKey(Long id);
 }

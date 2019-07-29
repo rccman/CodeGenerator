@@ -36,7 +36,8 @@ public class generatorController {
 	private String password; 
 	private String author;
 	private static String systemid = "hzfh";
-	
+	private static String commPackage = "com";
+
 	@RequestMapping("/")
 	public String mainUI(Model model){
 		return "main";
@@ -57,7 +58,7 @@ public class generatorController {
         username = map.get("uid");
         password = map.get("pwd");
         author = map.get("Author");
-		this.systemid = map.get("systemid").toString();
+		commPackage = map.get("commPackage").toString();
         try {
 			Class.forName(driver);
 			Connection conn = (Connection) DriverManager.getConnection(url+databaseName, username, password);
@@ -149,19 +150,19 @@ public class generatorController {
         String className = createBean.getClassNameByTableName(tableName);
         String lowerName = CommUtil.formatName(className);
         String databaseNameFormat = CommUtil.formatName(databaseName);
-        String packPath = "com"+File.separator+"hzfh"+File.separator+this.systemid+File.separator;
+        String packPath = commPackage+".";
         String configPath1 =databaseName+File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator;
         String configPath2 =databaseName+File.separator+ "src"+File.separator+"main"+File.separator+"resources"+File.separator;
         String configPath3 = configPath2 +"templates"+File.separator;
         String configPath4 = configPath2+"static"+File.separator;
-        String controllerPath = configPath1+packPath + "controller"+File.separator + className+"Controller.java";
-        String beanPath = configPath1+packPath + "entity"+File.separator + className+"Bean.java";
-        String paramPath = configPath1+packPath +"api"+File.separator+ "entity"+ File.separator+ className+"Param.java";
-        String daoPath = configPath1+packPath + "dao"+File.separator + className+"Dao.java";
+        String controllerPath = configPath1+packPath + "controller"+File.separator + className+"Rest.java";
+        String beanPath = configPath1+packPath + "po"+File.separator + className+"Po.java";
+        String paramPath = configPath1+packPath +"request"+ File.separator+ className+"Vo.java";
+        String daoPath = configPath1+packPath + "mapper"+File.separator + className+"Mapper.java";
         String servicePath = configPath1+packPath + "service"+File.separator + className+"Service.java";
         String serviceImplPath = configPath1+packPath + "service"+File.separator+"impl"+File.separator + className+"ServiceImpl.java";
 
-        String mapperXmlPath = configPath2+"mapper"+File.separator+this.systemid +File.separator + className+"Mapper.xml";
+        String mapperXmlPath = configPath2+"mapper"+ File.separator + className+"Mapper.xml";
 
 
 
@@ -169,8 +170,8 @@ public class generatorController {
         
         context.put("time", CommUtil.fromDate());
         context.put("className", className);
-        context.put("commPackage", "com.hzfh");
-        context.put("databaseName", this.systemid);
+        context.put("commPackage", commPackage);
+        context.put("databaseName", this.databaseName);
         context.put("lowerName", lowerName);
         context.put("tableName", tableName);
         context.put("feilds", createBean.getBeanFeilds(tableName,map));
@@ -184,7 +185,7 @@ public class generatorController {
         context.put("columnDatas", createBean.getColumnDatas(tableName,map));
         context.put("SQL", sqlMap);
         //windows
-        String pckPath = "E:"+File.separator+"Shared file"+File.separator+"code"+File.separator;
+        String pckPath = "D:"+File.separator+"Shared file"+File.separator+"code"+File.separator;
         //linux
         //String pckPath = File.separator+"usr"+File.separator+"local"+File.separator+"share"+File.separator+"code"+File.separator;
         CommonPageParser.WriterPage(context, "Entity.java", pckPath, beanPath);

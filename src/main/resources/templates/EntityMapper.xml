@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="${commPackage}.${databaseName}.dao.${className}Dao">
-	<resultMap id="resultMap" type="${commPackage}.${databaseName}.entity.${className}Bean">
+<mapper namespace="${commPackage}.mapper.${className}Mapper">
+	<resultMap id="resultMap" type="${commPackage}.entity.po.${className}Po">
 #foreach($item in $!{columnDatas})
 #if($!item.isTimeField())
-		<result property="$!item.formatColumnName" column="$!item.columnName"/>
+		<result property="$!item.formatColumnName" column="$!item.columnName" jdbcType="$!item.columnType"/>
 #else
-		<result property="$!item.formatColumnName" column="$!item.columnName"/>
+		<result property="$!item.formatColumnName" column="$!item.columnName" jdbcType="$!item.columnType"/>
 #end
 #end
     </resultMap>
@@ -14,22 +14,21 @@
         $!{SQL.columnFields}
     </sql>
     
-	<select id="findByWhere" resultMap="resultMap" parameterType="Object">
-		SELECT <include refid="column" /> FROM ${tableName} where 1=1
-		<if test="$!{columnDatas.get(1).getFormatColumnName()}!=null and $!{columnDatas.get(1).getFormatColumnName()}!=''">and $!{columnDatas.get(1).getColumnName()} like CONCAT('%','${$!{columnDatas.get(1).getFormatColumnName()}}','%')</if>
+	<select id="selectByWhere" resultMap="resultMap" parameterType="Object">
+		$!{SQL.selectByWhere}
 	</select>
 
-	<select id="findById" resultMap="resultMap" parameterType="Object">
+	<select id="selectByPrimaryKey" resultMap="resultMap" parameterType="Object">
 		$!{SQL.selectById}
 	</select>
 	
-	<insert id="addEntity" parameterType="Object" useGeneratedKeys="true" keyProperty="id" >
+	<insert id="insert" parameterType="Object" useGeneratedKeys="true" keyProperty="id" >
 		$!{SQL.insert}
 	</insert>
-	<update id="editEntity" parameterType="Object">
+	<update id="updateByPrimaryKey" parameterType="Object">
 		$!{SQL.update}
 	</update>
-	<delete id="deleteEntity" parameterType="Object">
-		delete from ${tableName} where id = #{id}
+	<delete id="deleteByPrimaryKey" parameterType="Object">
+		$!{SQL.delete}
 	</delete>
 </mapper>

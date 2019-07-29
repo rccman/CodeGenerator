@@ -162,7 +162,8 @@ function CRMUrl(action){
 		action = action.substring(1,action.length)
 	}
 	//webRoot暂时为跟路径，如果改变的话此处也要同步
-	var webRoot = "/CodeGenerator/";
+	// var webRoot = "/CodeGenerator/";
+	var webRoot = "/";
     var curPath=window.document.location.href;
     var pathName=window.document.location.pathname;
     var pos=curPath.indexOf(pathName);
