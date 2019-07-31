@@ -27,7 +27,7 @@ import com.mysql.jdbc.Connection;
 
 @Controller
 @RequestMapping("/")
-public class generatorController {
+public class GeneratorController {
 	
 	private String databaseName;
 	private String driver; 
