@@ -37,6 +37,7 @@ public class GeneratorController {
 	private String author;
 	private static String systemid = "hzfh";
 	private static String commPackage = "com";
+	private static String codePath = "D:/code";
 
 	@RequestMapping("/")
 	public String mainUI(Model model){
@@ -58,7 +59,8 @@ public class GeneratorController {
         username = map.get("uid");
         password = map.get("pwd");
         author = map.get("Author");
-		commPackage = map.get("commPackage").toString();
+		commPackage = map.get("commPackage");
+		codePath = map.get("codePath");
         try {
 			Class.forName(driver);
 			Connection conn = (Connection) DriverManager.getConnection(url+databaseName, username, password);
@@ -157,7 +159,7 @@ public class GeneratorController {
         String configPath4 = configPath2+"static"+File.separator;
         String controllerPath = configPath1+packPath + "controller"+File.separator + className+"Rest.java";
         String beanPath = configPath1+packPath + "po"+File.separator + className+"Po.java";
-        String paramPath = configPath1+packPath +"request"+ File.separator+ className+"Vo.java";
+        String paramPath = configPath1+packPath +"vo"+ File.separator+ className+"Vo.java";
         String daoPath = configPath1+packPath + "mapper"+File.separator + className+"Mapper.java";
         String servicePath = configPath1+packPath + "service"+File.separator + className+"Service.java";
         String serviceImplPath = configPath1+packPath + "service"+File.separator+"impl"+File.separator + className+"ServiceImpl.java";
@@ -185,7 +187,8 @@ public class GeneratorController {
         context.put("columnDatas", createBean.getColumnDatas(tableName,map));
         context.put("SQL", sqlMap);
         //windows
-        String pckPath = "D:"+File.separator+"Shared file"+File.separator+"code"+File.separator;
+//        String pckPath = "D:"+File.separator+"Shared file"+File.separator+"code"+File.separator;
+        String pckPath = this.formatCodePath(codePath);
         //linux
         //String pckPath = File.separator+"usr"+File.separator+"local"+File.separator+"share"+File.separator+"code"+File.separator;
         CommonPageParser.WriterPage(context, "Entity.java", pckPath, beanPath);
@@ -196,7 +199,11 @@ public class GeneratorController {
         CommonPageParser.WriterPage(context, "EntityServiceImpl.java", pckPath, serviceImplPath);
         CommonPageParser.WriterPage(context, "EntityMapper.xml", pckPath, mapperXmlPath);
     }
-	
+
+	private String formatCodePath(String codePath) {
+		return codePath+File.separator;
+	}
+
 	public String getPara(String key){
 		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();  
 		return request.getParameter(key);
