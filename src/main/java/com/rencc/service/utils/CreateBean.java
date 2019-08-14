@@ -64,12 +64,11 @@ public class CreateBean {
             name = CommUtil.formatName(name);
             str.append("\r\t/**\n\t * ").append(remark).append("\n\t **/");
             str.append("\r\t").append("private ").append(type + " ").append(name).append(";");
-            //get set 方法暂时注掉
-            /*String method = maxChar + name.substring(1, name.length());
+            String method = maxChar + name.substring(1, name.length());
             getset.append("\r\t").append("public ").append(type + " ").append("get" + method + "() {\r\t");
             getset.append("    return this.").append(name).append(";\r\t}");
             getset.append("\r\t").append("public void ").append("set" + method + "(" + type + " " + name + ") {\r\t");
-            getset.append("    this." + name + "=").append(name).append(";\r\t}");*/
+            getset.append("    this." + name + "=").append(name).append(";\r\t}");
         }
        
         String argv = str.toString();
